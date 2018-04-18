@@ -1,16 +1,16 @@
 from bloom_filter import *
 from aho import *
 from collections import deque
-import ahocorasick as ahc
 import math
 global prime_nos,phrases,word_code,input_phrases,input_phrases_idx
-prime_nos=(113,117,119,123,129,131,137)
+prime_nos=(3,5,7,11,13,17,19)
 phrases=[]
 word_code=[]
 input_phrases=[]
 input_phrases_idx=[]
 
 def detector(patt_file,input_file):
+
 	f=ff_bloom_filter(10000007)
 	input_code=deque()
 
@@ -36,8 +36,8 @@ def convertPhrases(patt_file):
 	appended=True
 	window=deque()
 	for c in patt_file:
-		if 'A'<=c<'Z':  
-			ascii_code=ascii_code+ord(c)-65
+		if c!=' ' and c!='\n' and c!='\t':  
+			ascii_code=ascii_code+ord(c)
 			word=word+c
 			appended=False
 		else: 
@@ -90,12 +90,12 @@ def scanInput(input_file,input_code,f):
 	first_letter=True
 	pair=[]
 	for i,c in enumerate(input_file):
-		if 'A'<=c<='Z':
+		if c!='\n' and c!=' ' and c!='\t':
 			if first_letter:
 				pair.append(i)
 				first=False
 			appended=False
-			ascii_code=ascii_code+ord(c)-65
+			ascii_code=ascii_code+ord(c)
 			word=word+c 
 		else:
 			if appended is False:
@@ -122,6 +122,7 @@ def scanInput(input_file,input_code,f):
 				appended=True
 				first_letter=True
 				pair=[]
+
 	return input_phrases,input_phrases_idx
 
 
@@ -158,7 +159,11 @@ def exactMatching(input_phrases,patterns):
 
 	k=len(patterns)
 
-	input_phrases,input_phrases_idx=A.searchWords(patterns,k,line)
+	input_phrases,input_phrases_idx=A.searchWords(patterns,k,line,input_phrases)
+
+	#print(patterns)
+
+	#print(line)
 
 	return input_phrases,input_phrases_idx
 
@@ -228,21 +233,15 @@ def percentage_calc(common_words,src_content,doc_content):
 	src_word=[]
 	doc_word=[]
 	for one_word in src_content.upper().split():
-		letter=one_word[len(one_word)-1]
-		if not 'A' <= letter <= 'Z':
-			src_word.append(one_word[:len(one_word)-1])
-		else:
-			src_word.append(one_word)
+		src_word.append(one_word)
 
 	for one_word in doc_content.upper().split():
-		letter=one_word[len(one_word)-1]
-		if not 'A' <= letter <= 'Z':
-			doc_word.append(one_word[:len(one_word)-1])
-		else:
-			doc_word.append(one_word)
+		doc_word.append(one_word)
 
 	src_size=len(src_word)
 	doc_size=len(doc_word)
+
+	#print(common_words)
 
 	d = len(common_words)
 	plagPercent1 = (d/float(src_size)) * 100
@@ -266,5 +265,3 @@ def main():
 
 if __name__ == '__main__':
 	main()
-
-
